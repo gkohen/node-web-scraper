@@ -1,4 +1,4 @@
-"use strict";
+require('strict-mode')(function () {
 var express = require('express');
 var _ = require('lodash');
 var request = require('request');
@@ -80,3 +80,4 @@ app.get('/', function (req, res) {
 app.listen('8080')
 console.log('Magic happens on port 8080');
 exports = module.exports = app;
+})
