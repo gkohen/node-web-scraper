@@ -1,4 +1,4 @@
-require('strict-mode')(function () {
+"use strict";
 var express = require('express');
 var _ = require('lodash');
 var request = require('request');
@@ -6,7 +6,7 @@ var Promise = require('bluebird');
 var rp = require('request-promise-any')
 var cheerio = require('cheerio');
 var app = express();
-
+var port = process.env["app_port"] | 8080;
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
@@ -21,8 +21,6 @@ app.get('/', function (req, res) {
 
             var entries = getLinks(html, url);
             Promise.all(getArticles(entries)).then(function(resolvedEntries){
-                console.log('--------------------------------------------');
-      //          console.log('resolvedEntries=',resolvedEntries);
 
                 renderResponse(res, groupArticles(resolvedEntries));
             });
@@ -77,7 +75,6 @@ app.get('/', function (req, res) {
     }
 })
 
-app.listen('8080')
-console.log('Magic happens on port 8080');
+app.listen(port)
+console.log('Magic happens on port '+port);
 exports = module.exports = app;
-})
