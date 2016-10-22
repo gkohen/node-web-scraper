@@ -1,16 +1,25 @@
 {
-  "name"         : "node-web-scrape",
-  "version"      : "0.0.1",
-  "description"  : "Scrape le web.",
-  "main"         : "server.js",
-  "author"       : "Scotch",
-  "repository"   : {
-    "type" : "git",
-    "url"  : "https://github.com/scotch-io/node-web-scraper"
+  "name": "node-web-scrape",
+  "version": "0.0.1",
+  "description": "Scrape le web.",
+  "main": "server.js",
+  "author": "Scotch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scotch-io/node-web-scraper"
   },
-  "dependencies" : {
-    "express"    : "latest",
-    "request"    : "latest",
-    "cheerio"    : "latest"
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "cheerio": "latest",
+    "express": "latest",
+    "jade": "^1.11.0",
+    "lodash": "^4.16.4",
+    "q": "^1.4.1",
+    "request": "latest",
+    "request-promise": "^4.1.1",
+    "request-promise-any": "^1.0.3"
+  },
+  "engines": {
+    "node": "6.1.0"
   }
 }

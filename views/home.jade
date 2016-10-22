@@ -1,0 +1,23 @@
+extends layout
+
+block title
+  title Blanchard Homework
+
+block content
+        each articleDayEntry in resolvedEntries
+            ul
+                h2
+                    !{articleDayEntry[0].date}
+                pre
+                    table.table
+                        thead: th
+                        tbody
+                            each articleEntry in articleDayEntry
+                                tr.success
+                                    td= articleEntry.name
+                                tr.warning
+                                    td
+                                        p
+                                            table !{articleEntry.content}
+
+
