@@ -1,4 +1,5 @@
-"use strict";
+'use strict';
+
 var express = require('express');
 var _ = require('lodash');
 var request = require('request');
@@ -7,6 +8,7 @@ var rp = require('request-promise-any')
 var cheerio = require('cheerio');
 var app = express();
 var port = process.env["app_port"] | 8080;
+var app_host = process.env.app_host || '127.0.0.1';
 app.set('view engine', 'jade');
 app.set('views', __dirname + '/views');
 
