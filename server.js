@@ -1,45 +1,82 @@
+"use strict";
 var express = require('express');
-var fs      = require('fs');
+var _ = require('lodash');
 var request = require('request');
+var Promise = require('bluebird');
+var rp = require('request-promise-any')
 var cheerio = require('cheerio');
-var app     = express();
+var app = express();
 
-app.get('/scrape', function(req, res){
-  // Let's scrape Anchorman 2
-  url = 'http://www.imdb.com/title/tt1229340/';
+app.set('view engine', 'jade');
+app.set('views', __dirname + '/views');
 
-  request(url, function(error, response, html){
-    if(!error){
-      var $ = cheerio.load(html);
 
-      var title, release, rating;
-      var json = { title : "", release : "", rating : ""};
+app.get('/', function (req, res) {
+    // Let's scrape Anchorman 2
+    url = 'http://bms.westfordk12.us/pages/teams/7/7%20BMS%20homework/0005FD48-80000001/';
 
-      $('.title_wrapper').filter(function(){
-        var data = $(this);
-        title = data.children().first().text().trim();
-        release = data.children().last().children().last().text().trim();
+    request(url, function (error, response, html) {
+        if (!error) {
+            var homeworkEntries = [];
 
-        json.title = title;
-        json.release = release;
-      })
+            var entries = getLinks(html, url);
+            Promise.all(getArticles(entries)).then(function(resolvedEntries){
+                console.log('--------------------------------------------');
+      //          console.log('resolvedEntries=',resolvedEntries);
 
-      $('.ratingValue').filter(function(){
-        var data = $(this);
-        rating = data.text().trim();
+                renderResponse(res, groupArticles(resolvedEntries));
+            });
 
-        json.rating = rating;
-      })
-    }
-
-    fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
-      console.log('File successfully written! - Check your project directory for the output.json file');
+            return;
+        }
     })
 
-    res.send('Check your console!')
-  })
+    function groupArticles(ungroupedArticles) {
+        var groupedArticles =  _(ungroupedArticles)
+            .groupBy(entry => entry.date)
+            .orderBy(entry => new Date(entry[0].date),'desc');
+        console.log(groupedArticles.value());
+        return groupedArticles.value();
+    }
+
+    function renderResponse(result, resolvedEntries){
+        result.render('home', {resolvedEntries: resolvedEntries});
+    }
+
+    function getArticles(articles) {
+        return articles.map(articleEntry => scrapeArticle(articleEntry) );
+    }
+
+    function scrapeArticle(entry) {
+        return rp(entry.link).then(html => cheerio.load(html)('td.innerCent table[summary]'))
+            .then(function (content) {
+                content.find('img').remove();
+                content.find('br').remove();
+                var articleScraped = Object.assign({}, entry, {
+                    content: content.html()
+                });
+
+                return articleScraped;
+            }).catch(error => console.log('Error!!! ',error));
+    }
+
+    function getLinks(html, base) {
+        var $ = cheerio.load(html),
+            entries = [];
+        console.log('scraping...');
+        $('tr.folderRow>td:first-child>div>a').toArray().map(function (htmlEntry, index) {
+            //     console.log(htmlEntry);
+            var entry = {};
+            entry.name = $(htmlEntry).text().replace(/[\d\-\/]/gi, '').trim();
+            entry.link = base + $(htmlEntry).attr('href');
+            entry.date = $($('tr.folderRow>td:nth-child(2)>div')[index]).text().replace('Updated: ','');
+            entries.push(entry);
+      //      console.log(entry);
+        });
+        return entries;
+    }
 })
 
-app.listen('8081')
-console.log('Magic happens on port 8081');
+app.listen('8080')
+console.log('Magic happens on port 8080');
 exports = module.exports = app;
