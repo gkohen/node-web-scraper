@@ -18,8 +18,5 @@
     "request": "latest",
     "request-promise": "^4.1.1",
     "request-promise-any": "^1.0.3"
-  },
-  "engines": {
-    "node": "6.1.0"
   }
 }
